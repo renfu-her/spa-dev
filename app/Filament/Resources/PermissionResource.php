@@ -21,6 +21,8 @@ class PermissionResource extends Resource
     protected static ?string $navigationGroup = '系統管理';
     
     protected static ?string $navigationLabel = '權限管理';
+
+    protected static ?string $modelLabel = '權限';
     
     protected static ?int $navigationSort = 1;
 

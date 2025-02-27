@@ -21,10 +21,6 @@ class StaffPerformanceStatistic extends Model
         'total_products_sold',
         'total_treatments_sold',
         'total_packages_sold',
-        'total_operations',
-        'total_commission',
-        'sales_commission',
-        'operation_commission',
         'total_customers_served',
         'total_appointments',
         'completed_appointments',
@@ -34,8 +30,6 @@ class StaffPerformanceStatistic extends Model
         'total_working_hours',
         'overtime_hours',
         'performance_score',
-        'top_products',
-        'top_treatments',
         'notes',
     ];
 
@@ -48,10 +42,6 @@ class StaffPerformanceStatistic extends Model
         'total_products_sold' => 'integer',
         'total_treatments_sold' => 'integer',
         'total_packages_sold' => 'integer',
-        'total_operations' => 'integer',
-        'total_commission' => 'decimal:2',
-        'sales_commission' => 'decimal:2',
-        'operation_commission' => 'decimal:2',
         'total_customers_served' => 'integer',
         'total_appointments' => 'integer',
         'completed_appointments' => 'integer',
@@ -61,8 +51,6 @@ class StaffPerformanceStatistic extends Model
         'total_working_hours' => 'decimal:2',
         'overtime_hours' => 'decimal:2',
         'performance_score' => 'decimal:1',
-        'top_products' => 'array',
-        'top_treatments' => 'array',
     ];
 
     /**
@@ -72,4 +60,4 @@ class StaffPerformanceStatistic extends Model
     {
         return $this->belongsTo(User::class, 'staff_id');
     }
-} 
+}

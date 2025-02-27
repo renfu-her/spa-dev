@@ -21,6 +21,8 @@ class StaffPerformanceStatisticResource extends Resource
     protected static ?string $navigationGroup = '統計分析';
     
     protected static ?string $navigationLabel = '員工績效統計';
+
+    protected static ?string $modelLabel = '員工績效統計';
     
     protected static ?int $navigationSort = 2;
 

@@ -22,6 +22,8 @@ class PromotionDiscountResource extends Resource
 
     protected static ?string $navigationLabel = '促銷折扣';
 
+    protected static ?string $modelLabel = '促銷折扣';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form

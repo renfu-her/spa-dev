@@ -21,6 +21,8 @@ class SystemSettingResource extends Resource
     protected static ?string $navigationGroup = '系統管理';
     
     protected static ?string $navigationLabel = '系統設定';
+
+    protected static ?string $modelLabel = '系統設定';
     
     protected static ?int $navigationSort = 5;
 

@@ -21,6 +21,8 @@ class SalesStatisticResource extends Resource
     protected static ?string $navigationGroup = '統計分析';
     
     protected static ?string $navigationLabel = '銷售統計';
+
+    protected static ?string $modelLabel = '銷售統計';
     
     protected static ?int $navigationSort = 1;
 

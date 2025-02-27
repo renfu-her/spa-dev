@@ -6,11 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        // 這些欄位已經在建立表格時加入，所以這個遷移檔案可以是空的
+        // 表格已經在之前的遷移中建立，所以這裡不需要重複建立
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         // 不需要執行任何操作

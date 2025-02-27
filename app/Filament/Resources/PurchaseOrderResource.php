@@ -24,6 +24,8 @@ class PurchaseOrderResource extends Resource
     protected static ?string $navigationGroup = '採購管理';
     
     protected static ?string $navigationLabel = '採購單';
+
+    protected static ?string $modelLabel = '採購單';
     
     protected static ?int $navigationSort = 1;
 

@@ -25,6 +25,8 @@ class SalesOrderResource extends Resource
 
     protected static ?string $navigationLabel = '銷售訂單';
 
+    protected static ?string $modelLabel = '銷售訂單';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form

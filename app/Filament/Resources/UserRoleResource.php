@@ -22,6 +22,8 @@ class UserRoleResource extends Resource
     protected static ?string $navigationGroup = '系統管理';
     
     protected static ?string $navigationLabel = '使用者角色';
+
+    protected static ?string $modelLabel = '使用者角色';
     
     protected static ?int $navigationSort = 3;
 

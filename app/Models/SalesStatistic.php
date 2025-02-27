@@ -28,10 +28,6 @@ class SalesStatistic extends Model
         'returning_customers',
         'average_order_value',
         'discount_amount',
-        'payment_methods_breakdown',
-        'top_products',
-        'top_treatments',
-        'top_packages',
         'notes',
     ];
 
@@ -53,9 +49,5 @@ class SalesStatistic extends Model
         'returning_customers' => 'integer',
         'average_order_value' => 'decimal:2',
         'discount_amount' => 'decimal:2',
-        'payment_methods_breakdown' => 'array',
-        'top_products' => 'array',
-        'top_treatments' => 'array',
-        'top_packages' => 'array',
     ];
-} 
+}
