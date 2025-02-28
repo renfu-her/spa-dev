@@ -16,15 +16,15 @@ class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-key';
-    
-    protected static ?string $navigationGroup = '系統管理';
-    
+    protected static ?string $navigationIcon = 'heroicon-o-lock-closed';
+
+    protected static ?string $navigationGroup = '系統設定';
+
     protected static ?string $navigationLabel = '權限管理';
 
     protected static ?string $modelLabel = '權限';
-    
-    protected static ?int $navigationSort = 1;
+
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -114,4 +114,4 @@ class PermissionResource extends Resource
             'edit' => Pages\EditPermission::route('/{record}/edit'),
         ];
     }
-} 
+}

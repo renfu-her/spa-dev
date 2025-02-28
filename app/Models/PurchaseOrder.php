@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class PurchaseOrder extends Model
 {
@@ -37,6 +38,42 @@ class PurchaseOrder extends Model
         'shipping_fee' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($purchaseOrder) {
+            if (!$purchaseOrder->purchase_number) {
+                $purchaseOrder->purchase_number = static::generatePurchaseNumber();
+            }
+        });
+    }
+
+    public static function generatePurchaseNumber()
+    {
+        $prefix = 'PO-';
+        $date = Carbon::now()->format('Ymd');
+        
+        // 獲取今天最後一個編號
+        $lastOrder = static::where('purchase_number', 'like', $prefix . $date . '%')
+            ->orderBy('purchase_number', 'desc')
+            ->first();
+
+        if ($lastOrder) {
+            // 從最後一個編號提取序號並加1
+            $lastNumber = intval(substr($lastOrder->purchase_number, -5));
+            $newNumber = $lastNumber + 1;
+        } else {
+            // 如果今天還沒有編號，從1開始
+            $newNumber = 1;
+        }
+
+        // 格式化為5位數的序號
+        $sequence = str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+        
+        return $prefix . $date . $sequence;
+    }
 
     /**
      * 獲取此採購單關聯的供應商

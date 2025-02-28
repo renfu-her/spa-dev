@@ -14,19 +14,20 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PurchaseOrderExport;
+use Carbon\Carbon;
 
 class PurchaseOrderResource extends Resource
 {
     protected static ?string $model = PurchaseOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
-    
+
     protected static ?string $navigationGroup = '採購管理';
-    
+
     protected static ?string $navigationLabel = '採購單';
 
     protected static ?string $modelLabel = '採購單';
-    
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -37,10 +38,9 @@ class PurchaseOrderResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('purchase_number')
                             ->label('採購單號')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->default(fn() => 'PO-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT)),
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->visible(fn($record) => $record !== null),
                         Forms\Components\Select::make('supplier_id')
                             ->label('供應商')
                             ->relationship('supplier', 'name')
@@ -56,7 +56,7 @@ class PurchaseOrderResource extends Resource
                         Forms\Components\DatePicker::make('purchase_date')
                             ->label('採購日期')
                             ->required()
-                            ->default(now()),
+                            ->default(fn() => \Carbon\Carbon::now()->toDateString()),
                         Forms\Components\Select::make('status')
                             ->label('狀態')
                             ->options([
@@ -70,7 +70,7 @@ class PurchaseOrderResource extends Resource
                             ->default('draft')
                             ->required(),
                     ])->columns(2),
-                
+
                 Forms\Components\Section::make('採購項目')
                     ->schema([
                         Forms\Components\Repeater::make('items')
@@ -90,16 +90,16 @@ class PurchaseOrderResource extends Resource
                                     ->minValue(1)
                                     ->required()
                                     ->live()
-                                    ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) => 
-                                        $set('subtotal', $get('quantity') * $get('unit_price'))),
+                                    ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) =>
+                                    $set('subtotal', $get('quantity') * $get('unit_price'))),
                                 Forms\Components\TextInput::make('unit_price')
                                     ->label('單價')
                                     ->numeric()
                                     ->prefix('NT$')
                                     ->required()
                                     ->live()
-                                    ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) => 
-                                        $set('subtotal', $get('quantity') * $get('unit_price'))),
+                                    ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) =>
+                                    $set('subtotal', $get('quantity') * $get('unit_price'))),
                                 Forms\Components\TextInput::make('subtotal')
                                     ->label('小計')
                                     ->numeric()
@@ -114,7 +114,7 @@ class PurchaseOrderResource extends Resource
                             ->collapsible()
                             ->cloneable(),
                     ]),
-                
+
                 Forms\Components\Section::make('金額資訊')
                     ->schema([
                         Forms\Components\TextInput::make('total_amount')
@@ -130,16 +130,16 @@ class PurchaseOrderResource extends Resource
                             ->prefix('NT$')
                             ->default(0)
                             ->live()
-                            ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) => 
-                                $set('final_amount', $get('total_amount') + $get('tax_amount') - $get('discount_amount'))),
+                            ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) =>
+                            $set('final_amount', $get('total_amount') + $get('tax_amount') - $get('discount_amount'))),
                         Forms\Components\TextInput::make('discount_amount')
                             ->label('折扣金額')
                             ->numeric()
                             ->prefix('NT$')
                             ->default(0)
                             ->live()
-                            ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) => 
-                                $set('final_amount', $get('total_amount') + $get('tax_amount') - $get('discount_amount'))),
+                            ->afterStateUpdated(fn(Forms\Set $set, Forms\Get $get) =>
+                            $set('final_amount', $get('total_amount') + $get('tax_amount') - $get('discount_amount'))),
                         Forms\Components\TextInput::make('final_amount')
                             ->label('最終金額')
                             ->numeric()
@@ -148,7 +148,7 @@ class PurchaseOrderResource extends Resource
                             ->dehydrated()
                             ->default(0),
                     ])->columns(2),
-                
+
                 Forms\Components\Section::make('其他資訊')
                     ->schema([
                         Forms\Components\Textarea::make('notes')
@@ -267,17 +267,17 @@ class PurchaseOrderResource extends Resource
                     ->action(function (PurchaseOrder $record) {
                         // 生成 PDF
                         $pdf = PDF::loadView('pdf.purchase-order', ['purchaseOrder' => $record]);
-                        
+
                         // 儲存 PDF
                         $pdfPath = 'purchase-orders/' . $record->purchase_number . '.pdf';
                         Storage::put('public/' . $pdfPath, $pdf->output());
-                        
+
                         // 更新記錄
                         $record->update([
                             'pdf_path' => $pdfPath,
                             'last_exported_at' => now(),
                         ]);
-                        
+
                         // 下載 PDF
                         return response()->download(storage_path('app/public/' . $pdfPath));
                     }),
@@ -288,13 +288,13 @@ class PurchaseOrderResource extends Resource
                         // 生成 Excel
                         $excelPath = 'purchase-orders/' . $record->purchase_number . '.xlsx';
                         Excel::store(new PurchaseOrderExport($record), 'public/' . $excelPath);
-                        
+
                         // 更新記錄
                         $record->update([
                             'excel_path' => $excelPath,
                             'last_exported_at' => now(),
                         ]);
-                        
+
                         // 下載 Excel
                         return response()->download(storage_path('app/public/' . $excelPath));
                     }),
@@ -322,4 +322,4 @@ class PurchaseOrderResource extends Resource
             'edit' => Pages\EditPurchaseOrder::route('/{record}/edit'),
         ];
     }
-} 
+}

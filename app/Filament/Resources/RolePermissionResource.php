@@ -12,20 +12,46 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class RolePermissionResource extends Resource
 {
     protected static ?string $model = RolePermission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-    
+
     protected static ?string $navigationGroup = '系統管理';
-    
+
     protected static ?string $navigationLabel = '角色權限';
 
     protected static ?string $modelLabel = '角色權限';
-    
+
     protected static ?int $navigationSort = 2;
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -109,9 +135,9 @@ class RolePermissionResource extends Resource
                         return $query
                             ->when(
                                 $data['value'],
-                                fn (Builder $query, $module): Builder => $query->whereHas(
+                                fn(Builder $query, $module): Builder => $query->whereHas(
                                     'permission',
-                                    fn (Builder $query) => $query->where('module', $module)
+                                    fn(Builder $query) => $query->where('module', $module)
                                 ),
                             );
                     }),
@@ -142,4 +168,4 @@ class RolePermissionResource extends Resource
             'edit' => Pages\EditRolePermission::route('/{record}/edit'),
         ];
     }
-} 
+}

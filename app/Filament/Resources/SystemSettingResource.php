@@ -11,20 +11,51 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class SystemSettingResource extends Resource
 {
     protected static ?string $model = SystemSetting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog';
-    
-    protected static ?string $navigationGroup = '系統管理';
-    
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+
+    protected static ?string $navigationGroup = '系統設定';
+
     protected static ?string $navigationLabel = '系統設定';
 
     protected static ?string $modelLabel = '系統設定';
-    
-    protected static ?int $navigationSort = 5;
+
+    protected static ?int $navigationSort = 4;
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('admin');
+    }
 
     public static function form(Form $form): Form
     {
@@ -138,4 +169,4 @@ class SystemSettingResource extends Resource
             'edit' => Pages\EditSystemSetting::route('/{record}/edit'),
         ];
     }
-} 
+}

@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -19,16 +20,31 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
     
-    protected static ?string $navigationGroup = '系統管理';
+    protected static ?string $navigationGroup = '系統設定';
     
     protected static ?string $navigationLabel = '使用者管理';
 
     protected static ?string $modelLabel = '使用者';
     
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 1;
+
+    protected static function getRoleLabel($roleName): string
+    {
+        return match ($roleName) {
+            'admin' => '管理者',
+            'manager' => '經理',
+            'staff' => '員工',
+            'operator' => '操作者',
+            default => $roleName,
+        };
+    }
 
     public static function form(Form $form): Form
     {
+        $roles = Role::all()->mapWithKeys(fn ($role) => [
+            $role->name => static::getRoleLabel($role->name)
+        ])->toArray();
+
         return $form
             ->schema([
                 Forms\Components\Section::make('使用者資訊')
@@ -46,9 +62,10 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('password')
                             ->label('密碼')
                             ->password()
-                            ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
-                            ->dehydrated(fn (?string $state): bool => filled($state))
-                            ->required(fn (string $operation): bool => $operation === 'create'),
+                            ->required(fn ($component, $get, $record) => ! $record)
+                            ->maxLength(255)
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
                         Forms\Components\TextInput::make('phone')
                             ->label('電話')
                             ->tel()
@@ -63,16 +80,17 @@ class UserResource extends Resource
                 
                 Forms\Components\Section::make('角色與權限')
                     ->schema([
-                        Forms\Components\CheckboxList::make('roles')
+                        Forms\Components\Select::make('roles')
                             ->label('角色')
-                            ->options([
-                                'admin' => '管理員',
-                                'manager' => '經理',
-                                'staff' => '員工',
-                                'operator' => '操作員',
-                            ])
-                            ->columns(2)
-                            ->relationship('userRoles', 'role'),
+                            ->multiple()
+                            ->relationship(
+                                'roles',
+                                'name',
+                                fn ($query) => $query->orderBy('name')
+                            )
+                            ->getOptionLabelFromRecordUsing(fn ($record) => static::getRoleLabel($record->name))
+                            ->preload()
+                            ->required(),
                     ]),
             ]);
     }
@@ -87,25 +105,17 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('電子郵件')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('角色')
+                    ->formatStateUsing(function ($record) {
+                        return $record->getRoleNames()
+                            ->map(fn ($role) => static::getRoleLabel($role))
+                            ->implode('、');
+                    })
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->label('電話')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('userRoles.role')
-                    ->label('角色')
-                    ->badge()
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'admin' => '管理員',
-                        'manager' => '經理',
-                        'staff' => '員工',
-                        'operator' => '操作員',
-                        default => $state,
-                    })
-                    ->colors([
-                        'danger' => 'admin',
-                        'warning' => 'manager',
-                        'success' => 'staff',
-                        'primary' => 'operator',
-                    ]),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('啟用')
                     ->boolean(),
@@ -123,24 +133,6 @@ class UserResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('啟用狀態'),
-                Tables\Filters\SelectFilter::make('role')
-                    ->label('角色')
-                    ->options([
-                        'admin' => '管理員',
-                        'manager' => '經理',
-                        'staff' => '員工',
-                        'operator' => '操作員',
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['value'],
-                                fn (Builder $query, $role): Builder => $query->whereHas(
-                                    'userRoles',
-                                    fn (Builder $query) => $query->where('role', $role)
-                                ),
-                            );
-                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -188,5 +180,15 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()->hasRole('admin');
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('admin');
     }
 } 

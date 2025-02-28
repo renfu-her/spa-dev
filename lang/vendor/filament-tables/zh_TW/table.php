@@ -81,4 +81,8 @@ return [
 
     ],
 
+    
+    'column_toggle' => [
+        'heading' => '顯示／隱藏直列',
+    ],
 ];

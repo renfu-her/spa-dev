@@ -12,20 +12,46 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class UserRoleResource extends Resource
 {
     protected static ?string $model = UserRole::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
-    
+
     protected static ?string $navigationGroup = '系統管理';
-    
+
     protected static ?string $navigationLabel = '使用者角色';
 
     protected static ?string $modelLabel = '使用者角色';
-    
+
     protected static ?int $navigationSort = 3;
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -125,4 +151,4 @@ class UserRoleResource extends Resource
             'edit' => Pages\EditUserRole::route('/{record}/edit'),
         ];
     }
-} 
+}
