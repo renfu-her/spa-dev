@@ -10,8 +10,11 @@ return new class extends Migration
     {
         if (Schema::hasTable('commission_settings')) {
             Schema::table('commission_settings', function (Blueprint $table) {
+                if (!Schema::hasColumn('commission_settings', 'type')) {
+                    $table->string('type')->nullable();
+                }
                 if (!Schema::hasColumn('commission_settings', 'target_amount')) {
-                    $table->decimal('target_amount', 10, 2)->nullable()->after('type');
+                    $table->decimal('target_amount', 10, 2)->nullable();
                 }
                 if (!Schema::hasColumn('commission_settings', 'is_active')) {
                     $table->boolean('is_active')->default(true)->after('end_date');
@@ -34,9 +37,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (Schema::hasTable('commission_settings') && 
-            Schema::hasColumn('commission_settings', 'target_amount') && 
-            Schema::hasColumn('commission_settings', 'is_active')) {
+        if (
+            Schema::hasTable('commission_settings') &&
+            Schema::hasColumn('commission_settings', 'target_amount') &&
+            Schema::hasColumn('commission_settings', 'is_active')
+        ) {
             Schema::table('commission_settings', function (Blueprint $table) {
                 $table->dropColumn(['target_amount', 'is_active']);
             });
@@ -44,4 +49,4 @@ return new class extends Migration
             Schema::dropIfExists('commission_settings');
         }
     }
-}; 
+};
