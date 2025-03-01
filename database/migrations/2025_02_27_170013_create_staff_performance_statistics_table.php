@@ -24,8 +24,8 @@ return new class extends Migration
             $table->json('top_products')->nullable();
             $table->json('top_treatments')->nullable();
             $table->timestamps();
-            
-            $table->unique(['staff_id', 'statistic_date', 'period_type']);
+
+            $table->unique(['staff_id', 'statistic_date', 'period_type'], 'staff_perf_unique_idx');
         });
     }
 
@@ -33,4 +33,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('staff_performance_statistics');
     }
-}; 
+};
