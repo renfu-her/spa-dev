@@ -16,13 +16,13 @@ class TreatmentPackageResource extends Resource
     protected static ?string $model = TreatmentPackage::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-gift';
-    
+
     protected static ?string $navigationLabel = '療程套餐';
-    
+
     protected static ?string $modelLabel = '療程套餐';
-    
+
     protected static ?string $pluralModelLabel = '療程套餐';
-    
+
     protected static ?string $navigationGroup = '療程管理';
 
     public static function form(Form $form): Form
@@ -176,10 +176,10 @@ class TreatmentPackageResource extends Resource
             ->filters([
                 Tables\Filters\Filter::make('is_active')
                     ->label('僅顯示啟用套餐')
-                    ->query(fn (Builder $query): Builder => $query->where('is_active', true)),
+                    ->query(fn(Builder $query): Builder => $query->where('is_active', true)),
                 Tables\Filters\Filter::make('members_only')
                     ->label('僅顯示會員專屬套餐')
-                    ->query(fn (Builder $query): Builder => $query->where('members_only', true)),
+                    ->query(fn(Builder $query): Builder => $query->where('members_only', true)),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -207,4 +207,4 @@ class TreatmentPackageResource extends Resource
             'edit' => Pages\EditTreatmentPackage::route('/{record}/edit'),
         ];
     }
-} 
+}

@@ -50,4 +50,4 @@ class TreatmentPackage extends Model
     {
         return $this->hasMany(CustomerTreatment::class, 'package_id');
     }
-} 
+}
